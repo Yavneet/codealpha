@@ -1,0 +1,146 @@
+package JAVA;
+import java.util.*;
+import java.text.SimpleDateFormat;
+class WeatherInfo {
+    private String description;
+    private double temperature;
+    public WeatherInfo(String description, double temperature) {
+        this.description = description;
+        this.temperature = temperature;
+    }
+    public String toString() {
+        return "Weather: " + description + ", Temperature: " + temperature + "°C";
+    }
+}
+class Map {
+    private String destination;
+    private String route;
+
+    public Map(String destination, String route) {
+        this.destination = destination;
+        this.route = route;
+    }
+
+    @Override
+    public String toString() {
+        return "Map: " + destination + ", Route: " + route;
+    }
+}
+
+class TravelPlan {
+    private double budget;
+    private WeatherInfo weatherInfo;
+    private Map map;
+    public TravelPlan(double budget, WeatherInfo weatherInfo, Map map) {
+        this.budget = budget;
+        this.weatherInfo = weatherInfo;
+        this.map = map;
+    }
+    @Override
+    public String toString() {
+        return "Travel Plan: \n" +
+                "Budget: $" + budget + "\n" +
+                weatherInfo + "\n" +
+                map;
+    }
+}
+class BudgetFeature {
+    public double calculateBudget(String destination, List<String> preferences) {
+        // Simple budget calculation logic
+        double baseBudget = getBaseBudget(destination);
+        double finalBudget = applyPreferences(baseBudget, preferences);
+        return finalBudget;
+    }
+
+    private double getBaseBudget(String destination) {
+        switch (destination.toLowerCase()) {
+            case "paris":
+                return 1000;
+            case "rome":
+                return 800;
+            case "barcelona":
+                return 1200;
+            default:
+                return 0;
+        }
+    }
+
+    private double applyPreferences(double baseBudget, List<String> preferences) {
+        double finalBudget = baseBudget;
+        if (preferences.contains("luxury")) {
+            finalBudget *= 2;
+        } else if (preferences.contains("budget")) {
+            finalBudget /= 2;
+        }
+        return finalBudget;
+    }
+}
+
+class WeatherFeature {
+    public WeatherInfo getWeatherInfo(String destination) {
+        // Simple weather information retrieval logic
+        switch (destination.toLowerCase()) {
+            case "paris":
+                return new WeatherInfo("Sunny", 22);
+            case "rome":
+                return new WeatherInfo("Cloudy", 25);
+            case "barcelona":
+                return new WeatherInfo("Rainy", 18);
+            default:
+                return null;
+        }
+    }
+}
+
+class MapFeature {
+    public Map generateMap(String destination) {
+        // Simple map generation logic
+        switch (destination.toLowerCase()) {
+            case "paris":
+                return new Map("Paris", "Eiffel Tower -> Louvre Museum -> Notre Dame Cathedral");
+            case "rome":
+                return new Map("Rome", "Colosseum -> Roman Forum -> Pantheon");
+            case "barcelona":
+                return new Map("Barcelona", "La Sagrada Familia -> Park Güell -> Barceloneta Beach");
+            default:
+                return null;
+        }
+    }
+}
+public class TravelItineraryPlanner {
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.print("Enter destination (Paris, Rome, Barcelona): ");
+            String destination = scanner.nextLine().trim();
+            System.out.print("Enter preferences (Luxury, Budget, Adventure, etc.): ");
+            List<String> preferences = new ArrayList<>();
+            String preference = scanner.nextLine().trim().toLowerCase();
+            while (!preference.equals("none")) {
+                preferences.add(preference);
+                System.out.print("Enter another preference or type 'none' to finish: ");
+                preference = scanner.nextLine().trim().toLowerCase();
+            }
+            System.out.print("Enter start date (yyyy-MM-dd): ");
+            Date startDate = dateFormat.parse(scanner.nextLine().trim());
+            System.out.print("Enter end date (yyyy-MM-dd): ");
+            Date endDate = dateFormat.parse(scanner.nextLine().trim());
+            TravelItineraryPlanner planner = new TravelItineraryPlanner();
+            TravelPlan travelPlan = planner.generateTravelPlan(destination, startDate, endDate, preferences);
+            System.out.println("\nGenerating Travel Plan...\n");
+            System.out.println(travelPlan);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    public TravelPlan generateTravelPlan(String destination, Date startDate, Date endDate, List<String> preferences) {
+        BudgetFeature budgetFeature = new BudgetFeature();
+        WeatherFeature weatherFeature = new WeatherFeature();
+        MapFeature mapFeature = new MapFeature();
+        double budget = budgetFeature.calculateBudget(destination, preferences);
+        WeatherInfo weatherInfo = weatherFeature.getWeatherInfo(destination);
+        Map map = mapFeature.generateMap(destination);
+        return new TravelPlan(budget, weatherInfo, map);
+    }
+}
